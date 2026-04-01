@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "nickkampe-portfolio",
+      "name": "skyedevops-portfolio",
       "dependencies": {
         "@sinclair/typebox": "^0.34.48",
       },

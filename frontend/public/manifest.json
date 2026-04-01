@@ -1,7 +1,7 @@
 {
-  "name": "Nick Kampe - Automation Specialist & DevOps Engineer",
-  "short_name": "Nick Kampe",
-  "description": "Portfolio of automation specialist and DevOps engineer with expertise in Kubernetes, infrastructure, and modern tooling",
+  "name": "Skyedevops - Modern DevOps & SRE Portfolio",
+  "short_name": "Skyedevops",
+  "description": "Modern DevOps and SRE portfolio with cloud-native, GitOps, and observability engineering using progressive web tech",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",

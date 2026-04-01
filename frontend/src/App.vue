@@ -23,8 +23,16 @@
           <span class="block hover:opacity-70">RESUME</span>
           <span class="absolute bottom-0 left-0 h-0.5 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500" :style="{ backgroundColor: `hsl(var(--color-primary-hsl) / 1)`, width: '100%' }"></span>
         </button>
+        <button ref="navAdminRef" @click="activeSection = 'admin'" class="relative text-white transition-all duration-200 group">
+          <span class="block hover:opacity-70">ADMIN</span>
+          <span class="absolute bottom-0 left-0 h-0.5 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500" :style="{ backgroundColor: `hsl(var(--color-primary-hsl) / 1)`, width: '100%' }"></span>
+        </button>
         <button ref="navContactRef" @click="activeSection = 'contact'" class="relative text-white transition-all duration-200 group">
           <span class="block hover:opacity-70">CONTACT</span>
+          <span class="absolute bottom-0 left-0 h-0.5 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500" :style="{ backgroundColor: `hsl(var(--color-primary-hsl) / 1)`, width: '100%' }"></span>
+        </button>
+        <button ref="navAdminRef" @click="activeSection = 'admin'" class="relative text-white transition-all duration-200 group">
+          <span class="block hover:opacity-70">ADMIN</span>
           <span class="absolute bottom-0 left-0 h-0.5 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500" :style="{ backgroundColor: `hsl(var(--color-primary-hsl) / 1)`, width: '100%' }"></span>
         </button>
       </nav>
@@ -238,8 +246,8 @@
             <div class="space-y-6 md:space-y-8 mt-0 pb-12" style="animation: slideInUp 0.6s ease-out 0.2s both;">
               <!-- Professional Summary -->
               <div class="p-4 md:p-5 border-2 bg-slate-900/40 transition-colors duration-300" :style="{ borderColor: `hsl(var(--color-secondary-hsl) / 0.5)` }" style="animation: slideInLeft 0.6s ease-out 0.3s both;">
-                <h3 class="font-bold mb-3 uppercase tracking-wider text-xs md:text-sm" :style="{ color: `hsl(var(--color-secondary-hsl) / 1)` }">▸ Automation Engineer & Platform Architect</h3>
-                <p class="text-white/75 text-xs md:text-sm leading-relaxed font-light">Specialist in designing and implementing enterprise DevOps solutions, Internal Development Platforms (IDPs), and cloud infrastructure automation. Deep expertise in Kubernetes, infrastructure-as-code, and GitOps workflows across AWS, GCP, and Azure. Experienced in delivering rapid infrastructure transformations for startups and enterprises. Available for contract-based DevOps automation, platform engineering, and infrastructure optimization engagements leveraging modern tooling and AI-driven workflows.</p>
+                <h3 class="font-bold mb-3 uppercase tracking-wider text-xs md:text-sm" :style="{ color: `hsl(var(--color-secondary-hsl) / 1)` }">▸ Modern DevOps Engineer & SRE</h3>
+                <p class="text-white/75 text-xs md:text-sm leading-relaxed font-light">Specialist in designing and implementing enterprise DevOps platforms, GitOps-based IDPs, and resilient cloud infrastructure automation. Deep expertise in Kubernetes, observability, infrastructure-as-code, CI/CD, and security-first workflows across AWS, GCP, Azure, and hybrid environments. Proven delivery of high-availability systems and distributed platform reliability for startups and enterprises.</p>
               </div>
 
               <!-- Work Experience -->
@@ -341,6 +349,62 @@
             </div>
           </template>
 
+          <!-- Admin -->
+          <template v-if="activeSection === 'admin'">
+            <div class="mb-8 md:mb-12">
+              <h2 class="text-4xl md:text-6xl font-serif font-black leading-none" :style="{ color: `hsl(var(--color-secondary-hsl) / 1)` }" style="letter-spacing: -2px;">ADMIN</h2>
+              <div class="h-1 mt-4 bg-gradient-to-r" :style="{ backgroundImage: `linear-gradient(to right, hsl(var(--color-secondary-hsl) / 0.8), hsl(var(--color-primary-hsl) / 0.4), transparent)` }"></div>
+            </div>
+            <div class="space-y-6 md:space-y-8 mt-0" style="animation: slideInUp 0.6s ease-out 0.2s both;">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-4 border-2 bg-slate-900/50 rounded-lg">
+                  <h3 class="font-bold mb-3 uppercase text-xs">Admin token</h3>
+                  <input v-model="adminToken" placeholder="Enter admin token" class="w-full px-3 py-2 bg-slate-900 border-2 rounded text-sm" />
+                  <button @click="saveAdminToken" class="mt-2 w-full px-3 py-2 bg-cyan-500 rounded text-black font-bold">Save token</button>
+                </div>
+                <div class="p-4 border-2 bg-slate-900/50 rounded-lg">
+                  <h3 class="font-bold mb-3 uppercase text-xs">User management</h3>
+                  <form @submit.prevent="createUser" class="space-y-2">
+                    <input v-model="newUser.name" placeholder="Name" class="w-full px-3 py-2 bg-slate-900 border-2 rounded text-sm" />
+                    <input v-model="newUser.email" placeholder="Email" class="w-full px-3 py-2 bg-slate-900 border-2 rounded text-sm" />
+                    <input v-model="newUser.discord" placeholder="Discord" class="w-full px-3 py-2 bg-slate-900 border-2 rounded text-sm" />
+                    <select v-model="newUser.role" class="w-full px-3 py-2 bg-slate-900 border-2 rounded text-sm">
+                      <option value="admin">admin</option>
+                      <option value="team">team</option>
+                      <option value="freelancer">freelancer</option>
+                      <option value="client">client</option>
+                    </select>
+                    <button type="submit" class="w-full px-3 py-2 bg-indigo-500 rounded font-bold">Create user</button>
+                  </form>
+                </div>
+              </div>
+
+              <div class="p-4 border-2 bg-slate-900/50 rounded-lg">
+                <h3 class="font-bold mb-2 uppercase text-xs">Users</h3>
+                <div class="max-h-48 overflow-y-auto">
+                  <ul>
+                    <li v-for="user in users" :key="user.id" class="flex justify-between gap-2 py-1">
+                      <span>{{ user.name }} ({{ user.role }})</span>
+                      <button @click="deleteUser(user.id)" class="text-red-400">Delete</button>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="p-4 border-2 bg-slate-900/50 rounded-lg">
+                <h3 class="font-bold mb-2 uppercase text-xs">Contacts</h3>
+                <div class="max-h-52 overflow-y-auto">
+                  <ul>
+                    <li v-for="contact in contacts" :key="contact.id" class="border-b border-slate-800 py-1 text-xs">
+                      <div class="font-semibold">{{ contact.name }} <span class="text-cyan-300">({{ contact.role || 'client' }})</span></div>
+                      <div>{{ contact.email }} / {{ contact.discord || 'no discord' }} - {{ contact.subject }}</div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </template>
+
           <!-- Contact -->
           <template v-if="activeSection === 'contact'">
             <div class="mb-8 md:mb-12">
@@ -350,35 +414,35 @@
             <div class="space-y-6 md:space-y-8 mt-0" style="animation: slideInUp 0.6s ease-out 0.2s both;">
               <div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
-                  <a href="https://github.com/Kampe" target="_blank" class="flex items-center gap-3 transition-all duration-300 group text-sm font-medium px-3 py-2 border rounded hover:bg-slate-900/40" :style="{ color: `hsl(var(--color-primary-hsl) / 0.7)`, borderColor: `hsl(var(--color-primary-hsl) / 0.3)` }">
+                  <a href="https://github.com/skyedevops" target="_blank" class="flex items-center gap-3 transition-all duration-300 group text-sm font-medium px-3 py-2 border rounded hover:bg-slate-900/40" :style="{ color: `hsl(var(--color-primary-hsl) / 0.7)`, borderColor: `hsl(var(--color-primary-hsl) / 0.3)` }">
                     <Github size="18" class="transition-transform duration-300 group-hover:scale-110" />
                     <span>GitHub</span>
                   </a>
-                  <a href="https://linkedin.com/in/Kampe" target="_blank" class="flex items-center gap-3 transition-all duration-300 group text-sm font-medium px-3 py-2 border rounded hover:bg-slate-900/40" :style="{ color: `hsl(var(--color-secondary-hsl) / 0.7)`, borderColor: `hsl(var(--color-secondary-hsl) / 0.3)` }">
+                  <a href="https://linkedin.com/in/skyedevops" target="_blank" class="flex items-center gap-3 transition-all duration-300 group text-sm font-medium px-3 py-2 border rounded hover:bg-slate-900/40" :style="{ color: `hsl(var(--color-secondary-hsl) / 0.7)`, borderColor: `hsl(var(--color-secondary-hsl) / 0.3)` }">
                     <Linkedin size="18" class="transition-transform duration-300 group-hover:scale-110" />
                     <span>LinkedIn</span>
                   </a>
-                  <a href="https://twitter.com/NickKampe" target="_blank" class="flex items-center gap-3 transition-all duration-300 group text-sm font-medium px-3 py-2 border rounded hover:bg-slate-900/40" :style="{ color: `hsl(var(--color-primary-hsl) / 0.7)`, borderColor: `hsl(var(--color-primary-hsl) / 0.3)` }">
+                  <a href="https://twitter.com/skyedevops" target="_blank" class="flex items-center gap-3 transition-all duration-300 group text-sm font-medium px-3 py-2 border rounded hover:bg-slate-900/40" :style="{ color: `hsl(var(--color-primary-hsl) / 0.7)`, borderColor: `hsl(var(--color-primary-hsl) / 0.3)` }">
                     <Twitter size="18" class="transition-transform duration-300 group-hover:scale-110" />
                     <span>Twitter/X</span>
                   </a>
-                  <a href="https://bitbucket.org/Kampe" target="_blank" class="flex items-center gap-3 transition-all duration-300 group text-sm font-medium px-3 py-2 border rounded hover:bg-slate-900/40" :style="{ color: `hsl(var(--color-secondary-hsl) / 0.7)`, borderColor: `hsl(var(--color-secondary-hsl) / 0.3)` }">
+                  <a href="https://bitbucket.org/skyedevops" target="_blank" class="flex items-center gap-3 transition-all duration-300 group text-sm font-medium px-3 py-2 border rounded hover:bg-slate-900/40" :style="{ color: `hsl(var(--color-secondary-hsl) / 0.7)`, borderColor: `hsl(var(--color-secondary-hsl) / 0.3)` }">
                     <svg size="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-[18px] h-[18px] transition-transform duration-300 group-hover:scale-110"><path d="M6 7c0-1.1.9-2 2-2h8c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2V7Z"/><path d="M6 17c0-1.1.9-2 2-2h8c1.1 0 2 .9 2 2v0c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2v0Z"/></svg>
                     <span>BitBucket</span>
                   </a>
-                  <a href="https://stackoverflow.com/users/201297/nickkampe" target="_blank" class="flex items-center gap-3 transition-all duration-300 group text-sm font-medium px-3 py-2 border rounded hover:bg-slate-900/40" :style="{ color: `hsl(var(--color-primary-hsl) / 0.7)`, borderColor: `hsl(var(--color-primary-hsl) / 0.3)` }">
+                  <a href="https://stackoverflow.com/users/201297/skyedevops" target="_blank" class="flex items-center gap-3 transition-all duration-300 group text-sm font-medium px-3 py-2 border rounded hover:bg-slate-900/40" :style="{ color: `hsl(var(--color-primary-hsl) / 0.7)`, borderColor: `hsl(var(--color-primary-hsl) / 0.3)` }">
                     <svg size="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-[18px] h-[18px] transition-transform duration-300 group-hover:scale-110"><path d="M6.5 12h11M6.5 16h11M8 19h8M8 8h8M4 6h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z"/></svg>
                     <span>Stack Overflow</span>
                   </a>
-                  <a href="https://angel.co/Kampe" target="_blank" class="flex items-center gap-3 transition-all duration-300 group text-sm font-medium px-3 py-2 border rounded hover:bg-slate-900/40" :style="{ color: `hsl(var(--color-secondary-hsl) / 0.7)`, borderColor: `hsl(var(--color-secondary-hsl) / 0.3)` }">
+                  <a href="https://angel.co/skyedevops" target="_blank" class="flex items-center gap-3 transition-all duration-300 group text-sm font-medium px-3 py-2 border rounded hover:bg-slate-900/40" :style="{ color: `hsl(var(--color-secondary-hsl) / 0.7)`, borderColor: `hsl(var(--color-secondary-hsl) / 0.3)` }">
                     <svg size="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-[18px] h-[18px] transition-transform duration-300 group-hover:scale-110"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M9 12h6"/></svg>
                     <span>AngelList</span>
                   </a>
-                  <a href="https://quora.com/Nick-Kampe" target="_blank" class="flex items-center gap-3 transition-all duration-300 group text-sm font-medium px-3 py-2 border rounded hover:bg-slate-900/40" :style="{ color: `hsl(var(--color-primary-hsl) / 0.7)`, borderColor: `hsl(var(--color-primary-hsl) / 0.3)` }">
+                  <a href="https://quora.com/skyedevops" target="_blank" class="flex items-center gap-3 transition-all duration-300 group text-sm font-medium px-3 py-2 border rounded hover:bg-slate-900/40" :style="{ color: `hsl(var(--color-primary-hsl) / 0.7)`, borderColor: `hsl(var(--color-primary-hsl) / 0.3)` }">
                     <svg size="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-[18px] h-[18px] transition-transform duration-300 group-hover:scale-110"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm3.43-5.71C15.5 12.5 14 14.02 14 15.5v.5h-2v-.5c0-2.23 1.77-3.82 4-4.13V9.62c0-.88-.56-1.62-1.5-1.62-.95 0-1.5.75-1.5 1.62h-2c0-2.02 1.45-3.62 3.5-3.62 2.1 0 3.5 1.6 3.5 3.62v3.36z"/></svg>
                     <span>Quora</span>
                   </a>
-                  <a href="https://facebook.com/NickKampe" target="_blank" class="flex items-center gap-3 transition-all duration-300 group text-sm font-medium px-3 py-2 border rounded hover:bg-slate-900/40" :style="{ color: `hsl(var(--color-secondary-hsl) / 0.7)`, borderColor: `hsl(var(--color-secondary-hsl) / 0.3)` }">
+                  <a href="https://facebook.com/skyedevops" target="_blank" class="flex items-center gap-3 transition-all duration-300 group text-sm font-medium px-3 py-2 border rounded hover:bg-slate-900/40" :style="{ color: `hsl(var(--color-secondary-hsl) / 0.7)`, borderColor: `hsl(var(--color-secondary-hsl) / 0.3)` }">
                     <Facebook size="18" class="transition-transform duration-300 group-hover:scale-110" />
                     <span>Facebook</span>
                   </a>
@@ -389,6 +453,13 @@
                   <span>▸ CONNECT WITH ME</span>
                   <span class="flex-1 h-px" :style="{ backgroundImage: `linear-gradient(to right, hsl(var(--color-primary-hsl) / 0.5), transparent)` }"></span>
                 </h3>
+              </div>
+              <div class="mt-4">
+                <button @click="startPayment" class="w-full md:w-auto px-5 py-3 font-bold uppercase tracking-widest text-sm rounded border-2 transition-all duration-300 flex items-center justify-center gap-2" :class="paymentLoading ? 'opacity-70 cursor-not-allowed' : ''" :style="{ borderColor: `hsl(var(--color-secondary-hsl) / 0.8)`, backgroundColor: 'rgba(14, 165, 233, 0.16)', color: 'white' }" :disabled="paymentLoading">
+                  <span v-if="paymentLoading">Processing payment...</span>
+                  <span v-else>Pay $199 + Checkout</span>
+                </button>
+                <p v-if="paymentMessage" class="mt-2 text-xs text-white/80">{{ paymentMessage }}</p>
               </div>
               <div>
                 <template v-if="formSuccess">
@@ -402,6 +473,15 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                     <input id="contact-name" name="name" v-model="form.name" type="text" placeholder="Your Name" class="w-full px-4 md:px-5 py-2 md:py-3 bg-slate-900/60 border-2 text-white placeholder-slate-500 focus:outline-none focus:bg-slate-900/80 transition-all duration-300 text-xs md:text-sm font-light" :style="{ borderColor: `hsl(var(--color-primary-hsl) / 0.5)` }" required />
                     <input id="contact-email" name="email" v-model="form.email" type="email" placeholder="Your Email" class="w-full px-4 md:px-5 py-2 md:py-3 bg-slate-900/60 border-2 text-white placeholder-slate-500 focus:outline-none focus:bg-slate-900/80 transition-all duration-300 text-xs md:text-sm font-light" :style="{ borderColor: `hsl(var(--color-secondary-hsl) / 0.5)` }" required />
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                    <input id="contact-discord" name="discord" v-model="form.discord" type="text" placeholder="Discord (username#1234)" class="w-full px-4 md:px-5 py-2 md:py-3 bg-slate-900/60 border-2 text-white placeholder-slate-500 focus:outline-none focus:bg-slate-900/80 transition-all duration-300 text-xs md:text-sm font-light" :style="{ borderColor: `hsl(var(--color-primary-hsl) / 0.5)` }" />
+                    <select id="contact-role" name="role" v-model="form.role" class="w-full px-4 md:px-5 py-2 md:py-3 bg-slate-900/60 border-2 text-white text-xs md:text-sm font-light" :style="{ borderColor: `hsl(var(--color-secondary-hsl) / 0.5)` }">
+                      <option value="admin">Admin</option>
+                      <option value="team">Team</option>
+                      <option value="freelancer">Freelancer</option>
+                      <option value="client">Client/Buyer</option>
+                    </select>
                   </div>
                   <textarea id="contact-message" name="message" v-model="form.message" placeholder="Your Message" rows="5" class="w-full px-4 md:px-5 py-2 md:py-3 bg-slate-900/60 border-2 text-white placeholder-slate-500 focus:outline-none focus:bg-slate-900/80 transition-all duration-300 resize-none text-xs md:text-sm font-light" :style="{ borderColor: `hsl(var(--color-primary-hsl) / 0.5)` }" required></textarea>
                   <button id="contact-submit" type="submit" class="w-full px-6 md:px-8 py-3 md:py-4 font-bold transition-all duration-300 text-xs md:text-sm uppercase tracking-widest text-black shadow-lg border-2 flex items-center justify-center gap-2" :style="{ backgroundImage: `linear-gradient(to right, hsl(var(--color-primary-hsl) / 0.6), hsl(var(--color-secondary-hsl) / 0.6))`, borderColor: `hsl(var(--color-primary-hsl) / 0.5)`, boxShadow: `0 0 30px hsl(var(--color-primary-hsl) / 0.25)` }">
@@ -427,22 +507,37 @@ import { getRandomPalette, applyPaletteToDOM } from './utils/colorPalettes'
 import { trackPageView, trackSectionView, trackFormSubmission, trackExternalLink, trackNavigation, trackScrollDepth, trackError } from './utils/analytics'
 
 const activeSection = ref<string | null>(null)
-const form = ref({ name: '', email: '', subject: '', message: '' })
+const form = ref({ name: '', email: '', discord: '', role: 'client', subject: '', message: '' })
 const formSuccess = ref(false)
 const formError = ref(false)
+const paymentLoading = ref(false)
+const paymentMessage = ref('')
 const navRef = ref<HTMLElement | null>(null)
 const navAboutRef = ref<HTMLElement | null>(null)
 const navSkillsRef = ref<HTMLElement | null>(null)
 const navResumeRef = ref<HTMLElement | null>(null)
 const navContactRef = ref<HTMLElement | null>(null)
+const navAdminRef = ref<HTMLElement | null>(null)
 const currentPalette = ref(getRandomPalette())
 
 const trackCurrentPage = () => {
   const pagePath = `${window.location.pathname}${window.location.search}${window.location.hash}`
   trackPageView(pagePath)
-}
 
-let maxScrollDepth = 0
+    // Simple payment outcome state handling
+    if (window.location.pathname === '/payment-success') {
+      activeSection.value = 'contact'
+      paymentMessage.value = 'Payment successful! Thank you for your order.'
+      paymentLoading.value = false
+      return
+    }
+
+    if (window.location.pathname === '/payment-cancel') {
+      activeSection.value = 'contact'
+      paymentMessage.value = 'Payment was canceled. Try again or contact support.'
+      paymentLoading.value = false
+      return
+    }
 const handleScroll = () => {
   const scrollHeight = document.documentElement.scrollHeight - window.innerHeight
   const scrollTop = window.scrollY
@@ -486,7 +581,11 @@ const submitForm = async () => {
     const response = await fetch('/api/contact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form.value)
+      body: JSON.stringify({
+        ...form.value,
+        role: form.value.role || 'client',
+        discord: form.value.discord || ''
+      })
     })
     const result = await response.json()
     if (result.success) {
@@ -512,6 +611,45 @@ const submitForm = async () => {
     setTimeout(() => {
       formError.value = false
     }, 3000)
+  }
+}
+
+const startPayment = async () => {
+  try {
+    paymentLoading.value = true
+    paymentMessage.value = ''
+
+    const response = await fetch('/api/payment/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: 19900,
+        currency: 'usd',
+        description: 'Skyedevops consult + workshop',
+        successUrl: 'https://skyedev.org/payment-success',
+        cancelUrl: 'https://skyedev.org/payment-cancel'
+      })
+    })
+
+    const result = await response.json()
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || 'Payment checkout failed')
+    }
+
+    if (result.data?.url) {
+      window.location.href = result.data.url
+      return
+    }
+
+    paymentMessage.value = 'Payment session created. Please finalize payment in your bank portal.'
+  } catch (error) {
+    paymentMessage.value = error instanceof Error ? error.message : 'Payment request failed'
+  } finally {
+    paymentLoading.value = false
+    setTimeout(() => {
+      paymentMessage.value = ''
+    }, 5000)
   }
 }
 
@@ -569,7 +707,7 @@ onMounted(async () => {
   )
 
   // Add subtle hover animations via GSAP
-  const navButtons = [navAboutRef.value, navSkillsRef.value, navResumeRef.value, navContactRef.value]
+  const navButtons = [navAboutRef.value, navSkillsRef.value, navResumeRef.value, navAdminRef.value, navContactRef.value]
   navButtons.forEach((btn) => {
     if (!btn) return
     btn.addEventListener('mouseenter', () => {

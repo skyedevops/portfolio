@@ -1,6 +1,7 @@
 import { existsSync, statSync } from 'fs'
 import { join } from 'path'
-import { sendContactEmail } from './routes/contact'
+import { sendContactEmail, ContactMessage } from './routes/contact'
+import { getContacts, addContact, getUsers, addUser, removeUser, UserRecord } from './data-store'
 
 const PORT = 3001
 // Use absolute path in container, relative path in dev
@@ -8,10 +9,8 @@ const PUBLIC_DIR = process.env.NODE_ENV === 'production'
   ? '/app/backend/public'
   : join(import.meta.dir, '../public')
 
-function getMimeType(filePath: string): string {
-  const ext = filePath.split('.').pop()?.toLowerCase()
-
-  const mimeTypes: Record<string, string> = {
+  const ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'admin-token'
+  const isAdminRequest = (request: any) => request.headers.get('x-admin-token') === ADMIN_TOKEN
     'html': 'text/html',
     'css': 'text/css',
     'js': 'application/javascript',
@@ -67,6 +66,12 @@ function isRegularFile(filePath: string): boolean {
   }
 }
 
+function isAdminRequest(request: any): boolean {
+  const token = request.headers.get('x-admin-token') || ''
+  const expected = process.env.ADMIN_TOKEN || 'admin-secret'
+  return token === expected
+}
+
 export function startServer() {
   const server = Bun.serve({
     port: PORT,
@@ -87,17 +92,42 @@ export function startServer() {
         )
       }
 
+      // Payment return pages (success/cancel)
+      if (pathname === '/payment-success') {
+        return new Response(`<!doctype html><html><head><meta charset="utf-8"><title>Payment Success</title></head><body style="background:#050a16;color:#f8fafc;font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;"><div style="text-align:center;"><h1>Payment completed</h1><p>Thank you! Your transaction was successful.</p><a href="/" style="color:#22d3ee;text-decoration:none;">Return to homepage</a></div></body></html>`, {
+          headers: { 'Content-Type': 'text/html' }
+        })
+      }
+
+      if (pathname === '/payment-cancel') {
+        return new Response(`<!doctype html><html><head><meta charset="utf-8"><title>Payment Canceled</title></head><body style="background:#050a16;color:#f8fafc;font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;"><div style="text-align:center;"><h1>Payment canceled</h1><p>Your payment was canceled. You can retry or contact us if you need help.</p><a href="/" style="color:#22d3ee;text-decoration:none;">Return to homepage</a></div></body></html>`, {
+          headers: { 'Content-Type': 'text/html' }
+        })
+      }
+
       // API endpoints
       if (pathname === '/api/contact' && request.method === 'POST') {
         try {
           const body = await request.json()
-          const result = await sendContactEmail({
+          const data: ContactMessage = {
             name: body.name || '',
             email: body.email || '',
+            discord: body.discord || '',
+            role: ['admin', 'team', 'freelancer', 'client'].includes(body.role) ? body.role : 'client',
             subject: body.subject || '',
-            message: body.message || '',
-          })
-          return new Response(JSON.stringify(result), {
+            message: body.message || ''
+          }
+
+          const result = await sendContactEmail(data)
+
+          const contactEntry = {
+            id: crypto.randomUUID(),
+            ...data,
+            createdAt: new Date().toISOString()
+          }
+          addContact(contactEntry)
+
+          return new Response(JSON.stringify({ ...result, contact: contactEntry }), {
             headers: { 'Content-Type': 'application/json' }
           })
         } catch (error) {
@@ -105,6 +135,146 @@ export function startServer() {
             JSON.stringify({ error: 'Failed to process contact form' }),
             { status: 500, headers: { 'Content-Type': 'application/json' } }
           )
+        }
+      }
+
+      if (pathname === '/api/contacts' && request.method === 'GET') {
+        const url = new URL(request.url)
+        const role = url.searchParams.get('role') as 'admin' | 'team' | 'freelancer' | 'client' | null
+        const search = url.searchParams.get('search')?.toLowerCase() || ''
+
+        let contacts = getContacts()
+
+        if (role) {
+          contacts = contacts.filter((c) => c.role === role)
+        }
+
+        if (search) {
+          contacts = contacts.filter((c) =>
+            c.name.toLowerCase().includes(search) ||
+            c.email.toLowerCase().includes(search) ||
+            (c.discord || '').toLowerCase().includes(search) ||
+            c.subject.toLowerCase().includes(search) ||
+            c.message.toLowerCase().includes(search)
+          )
+        }
+
+        return new Response(JSON.stringify({ success: true, data: contacts }), {
+          headers: { 'Content-Type': 'application/json' }
+        })
+      }
+
+      if (pathname === '/api/users' && request.method === 'GET') {
+        const url = new URL(request.url)
+        const role = url.searchParams.get('role') as 'admin' | 'team' | 'freelancer' | 'client' | null
+        let users = getUsers()
+
+        if (role) {
+          users = users.filter((u) => u.role === role)
+        }
+
+        return new Response(JSON.stringify({ success: true, data: users }), {
+          headers: { 'Content-Type': 'application/json' }
+        })
+      }
+
+      if (pathname === '/api/users' && request.method === 'POST') {
+        if (!isAdminRequest(request)) {
+          return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' }
+          })
+        }
+
+        const body = await request.json()
+        const user: UserRecord = {
+          id: crypto.randomUUID(),
+          name: body.name || 'Unnamed',
+          email: body.email || '',
+          role: ['admin', 'team', 'freelancer', 'client'].includes(body.role) ? body.role : 'client',
+          createdAt: new Date().toISOString()
+        }
+
+        addUser(user)
+
+        return new Response(JSON.stringify({ success: true, data: user }), {
+          headers: { 'Content-Type': 'application/json' }
+        })
+      }
+
+      if (pathname.startsWith('/api/users/') && request.method === 'DELETE') {
+        if (!isAdminRequest(request)) {
+          return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' }
+          })
+        }
+
+        const userId = pathname.replace('/api/users/', '')
+        const deleted = removeUser(userId)
+
+        if (!deleted) {
+          return new Response(JSON.stringify({ success: false, error: 'User not found' }), {
+            status: 404,
+            headers: { 'Content-Type': 'application/json' }
+          })
+        }
+
+        return new Response(JSON.stringify({ success: true, id: userId }), {
+          headers: { 'Content-Type': 'application/json' }
+        })
+      }
+
+      if (pathname === '/api/payment/checkout' && request.method === 'POST') {
+        const stripeSecret = process.env.STRIPE_SECRET
+        if (!stripeSecret) {
+          return new Response(JSON.stringify({ success: false, error: 'Stripe not configured' }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+          })
+        }
+
+        try {
+          const body = await request.json()
+          const amount = Number(body.amount || 19900)
+          const currency = (body.currency || 'usd').toLowerCase()
+          const description = body.description || 'Portfolio consultation'
+          const successUrl = body.successUrl || 'https://skyedev.org/payment-success'
+          const cancelUrl = body.cancelUrl || 'https://skyedev.org/payment-cancel'
+
+          const stripeBody = new URLSearchParams()
+          stripeBody.append('payment_method_types[]', 'card')
+          stripeBody.append('mode', 'payment')
+          stripeBody.append('success_url', successUrl)
+          stripeBody.append('cancel_url', cancelUrl)
+          stripeBody.append('line_items[0][price_data][currency]', currency)
+          stripeBody.append('line_items[0][price_data][product_data][name]', description)
+          stripeBody.append('line_items[0][price_data][unit_amount]', String(amount))
+          stripeBody.append('line_items[0][quantity]', '1')
+
+          const stripeResponse = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              Authorization: `Bearer ${stripeSecret}`
+            },
+            body: stripeBody.toString()
+          })
+
+          const stripeData = await stripeResponse.json()
+
+          if (!stripeResponse.ok) {
+            throw new Error(stripeData.error?.message || 'Stripe checkout failed')
+          }
+
+          return new Response(JSON.stringify({ success: true, data: stripeData }), {
+            headers: { 'Content-Type': 'application/json' }
+          })
+        } catch (error) {
+          return new Response(JSON.stringify({ success: false, error: error instanceof Error ? error.message : 'Payment creation failed' }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+          })
         }
       }
 

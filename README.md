@@ -1,6 +1,6 @@
-# skyedevops Portfolio
+# Skyedev Portfolio
 
-Welcome to the skyedevops portfolio!
+Welcome to the Skyedev (skyedev.org) modern DevOps portfolio!
 
 ## Homepage
 Visit us at [skyedev.org](https://skyedev.org)

@@ -1,4 +1,4 @@
-Contact: https://github.com/Kampe
+Contact: https://github.com/skyedevops
 Preferred-Languages: en
 Expires: 2028-02-18T00:00:00.000Z
-Canonical: https://nickkampe.com/.well-known/security.txt
+Canonical: https://skyedev.org/.well-known/security.txt

@@ -21,6 +21,8 @@ describe('Contact Form Handler', () => {
     const message: ContactMessage = {
       name: '',
       email: '',
+      discord: '',
+      role: 'client',
       subject: '',
       message: ''
     }

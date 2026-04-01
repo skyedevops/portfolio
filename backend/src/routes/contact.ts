@@ -3,11 +3,21 @@ const FORMSPREE_ID = 'meelkpqg'
 export interface ContactMessage {
   name: string
   email: string
+  discord?: string
+  role?: 'admin' | 'team' | 'freelancer' | 'client'
   subject: string
   message: string
 }
 
 export async function sendContactEmail(data: ContactMessage) {
+  // Fast-path for tests and local development without external network dependency
+  if (process.env.NODE_ENV === 'test' || process.env.FORMSPREE_MOCK === '1') {
+    return {
+      success: true,
+      message: 'Test mode: message received (mock)',
+    }
+  }
+
   try {
     const response = await fetch(
       `https://formspree.io/f/${FORMSPREE_ID}`,
@@ -19,6 +29,8 @@ export async function sendContactEmail(data: ContactMessage) {
         body: JSON.stringify({
           name: data.name,
           email: data.email,
+          discord: data.discord,
+          role: data.role,
           subject: data.subject,
           message: data.message,
         }),

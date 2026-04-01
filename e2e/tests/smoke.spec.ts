@@ -3,7 +3,7 @@ import { injectAxe, checkA11y } from 'axe-playwright'
 
 test('homepage loads successfully', async ({ page }) => {
   await page.goto('/')
-  await expect(page).toHaveTitle(/Nicholas Kampe/)
+  await expect(page).toHaveTitle(/Skyedevops/)
 })
 
 test('health endpoint works', async ({ page }) => {

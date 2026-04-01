@@ -106,6 +106,24 @@ describe('API Endpoints (Integration - requires running server)', () => {
     expect(data.success).toBe(true)
   })
 
+    it('skip: POST /api/payment/checkout should return 500 when Stripe not configured', async () => {
+    const serverRunning = await testIfServerRunning()
+    if (!serverRunning) {
+      return
+    }
+
+    const response = await fetch(`${BASE_URL}/api/payment/checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: 19900, currency: 'usd', description: 'Consult test' }),
+      signal: AbortSignal.timeout(5000)
+    })
+
+    expect(response.status).toBe(500)
+    const data = await response.json()
+    expect(data.success).toBeFalsy()
+  })
+
   it('skip: GET /api/nonexistent should return 404', async () => {
     const serverRunning = await testIfServerRunning()
     if (!serverRunning) {

@@ -9,7 +9,7 @@
         <!-- Name + Role -->
         <div ref="heroNameRef">
           <h1 ref="nameRef" class="text-4xl md:text-6xl font-bold mb-2 md:mb-3 leading-tight text-white" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; letter-spacing: -0.02em; text-shadow: 0 0 20px rgba(0,0,0,0.8), 2px 2px 4px rgba(0,0,0,0.9);">
-            NICK KAMPE
+            SKYEDEVOPS
           </h1>
           <p ref="roleRef" class="text-sm md:text-lg tracking-wider font-semibold inline-flex gap-1 md:gap-2 flex-wrap justify-center px-2" style="font-family: 'Space Grotesk', sans-serif; font-weight: 500; letter-spacing: 0.08em; opacity: 0; color: hsl(var(--color-secondary-hsl) / 1); text-shadow: 0 0 12px rgba(0,0,0,0.7), 1px 1px 3px rgba(0,0,0,0.8);">
             <span class="role-item">Platform Engineer</span>
@@ -22,7 +22,7 @@
 
         <!-- Tagline -->
         <p ref="taglineRef" class="text-sm md:text-base max-w-sm md:max-w-5xl mx-auto leading-relaxed px-2 text-white/80" style="font-family: 'Inter', sans-serif; font-weight: 400; opacity: 0; text-shadow: 0 0 10px rgba(0,0,0,0.6), 1px 1px 2px rgba(0,0,0,0.7);">
-          Expert infrastructure architect & automation specialist scaling production systems for startups and enterprise. <br class="hidden md:block">Designing cloud migrations, deploying modern CI/CD solutions, and building scalable platforms. <br class="hidden md:block"><span class="whitespace-nowrap">15+ years of proven expertise.</span> <span class="whitespace-nowrap">Available for strategic long-term engagements.</span>
+          Modern DevOps engineer & SRE building resilient cloud-native platforms for startups and enterprise. <br class="hidden md:block">Designing GitOps-powered pipelines, secure CI/CD frameworks, and scalable observability platforms. <br class="hidden md:block"><span class="whitespace-nowrap">15+ years of proven reliability crafting production-grade infrastructure.</span> <span class="whitespace-nowrap">Available for strategic long-term engagements.</span>
         </p>
 
         <!-- CTA Buttons -->
@@ -32,7 +32,7 @@
             <span class="relative flex items-center gap-2"><Mail size="18" />Contact Me</span>
             <span class="absolute bottom-0 left-0 w-0 h-1 transition-all duration-500" :style="{ backgroundImage: `linear-gradient(to right, hsl(var(--color-primary-hsl) / 1), hsl(var(--color-secondary-hsl) / 1))`, width: hoverPrimaryBtn ? '100%' : '0%' }"></span>
           </button>
-          <a href="https://github.com/Kampe" target="_blank" class="relative inline-block px-4 md:px-6 py-2 border-2 text-white font-semibold transition-all duration-300 text-xs md:text-sm uppercase tracking-widest whitespace-nowrap group overflow-hidden rounded-lg" :style="{ borderColor: `hsl(var(--color-primary-hsl) / 1)`, color: 'white', textShadow: '0 0 8px rgba(0,0,0,0.6), 1px 1px 2px rgba(0,0,0,0.7)' }" @mouseenter="hoverGithubBtn = true" @mouseleave="hoverGithubBtn = false">
+          <a href="https://github.com/skyedevops" target="_blank" class="relative inline-block px-4 md:px-6 py-2 border-2 text-white font-semibold transition-all duration-300 text-xs md:text-sm uppercase tracking-widest whitespace-nowrap group overflow-hidden rounded-lg" :style="{ borderColor: `hsl(var(--color-primary-hsl) / 1)`, color: 'white', textShadow: '0 0 8px rgba(0,0,0,0.6), 1px 1px 2px rgba(0,0,0,0.7)' }" @mouseenter="hoverGithubBtn = true" @mouseleave="hoverGithubBtn = false">
             <span class="absolute inset-0 transition-colors duration-300" :style="{ backgroundColor: `hsl(var(--color-accent-hsl) / ${hoverGithubBtn ? 0.1 : 0.05})` }"></span>
             <span class="relative flex items-center gap-2"><Github size="18" />GitHub</span>
             <span class="absolute bottom-0 left-0 w-0 h-1 transition-all duration-500" :style="{ backgroundImage: `linear-gradient(to right, hsl(var(--color-primary-hsl) / 1), hsl(var(--color-secondary-hsl) / 1))`, width: hoverGithubBtn ? '100%' : '0%' }"></span>

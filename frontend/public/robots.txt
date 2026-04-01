@@ -4,4 +4,4 @@ Disallow: /api/
 Disallow: /.well-known/
 
 # Sitemaps
-Sitemap: https://nickkampe.com/sitemap.xml
+Sitemap: https://skyedev.org/sitemap.xml

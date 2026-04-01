@@ -1,7 +1,7 @@
 {
-  "name": "nickkampe-portfolio",
+  "name": "skyedev-portfolio",
   "version": "1.0.0",
-  "description": "State-of-the-art portfolio with generative art - Nicholas Kampe",
+  "description": "Modern DevOps portfolio with generative art - Skyedevops",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -36,7 +36,7 @@
     "vue3",
     "bun"
   ],
-  "author": "Nicholas Kampe",
+  "author": "Skyedevops",
   "dependencies": {
     "@sinclair/typebox": "^0.34.48"
   },
