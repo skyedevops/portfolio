@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 
 test('homepage loads successfully', async ({ page }) => {
   await page.goto('/')
-  await expect(page).toHaveTitle(//)
+  await expect(page).toHaveTitle(/Skyedevops/)
 
   // Check that main content is visible
   const canvas = page.locator('canvas')

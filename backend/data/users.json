@@ -1,0 +1,98 @@
+[
+  {
+    "id": "25993ae0-e351-42f5-8fd0-b6665c2531e2",
+    "name": "Test Admin",
+    "email": "admin@example.com",
+    "password": "admin123",
+    "role": "admin",
+    "createdAt": "2026-04-03T19:44:53.551Z"
+  },
+  {
+    "id": "ed8126a4-b6b3-4286-b1de-3087bb374b86",
+    "name": "Test Admin",
+    "email": "admin@example.com",
+    "password": "admin123",
+    "role": "admin",
+    "createdAt": "2026-04-03T19:44:55.135Z"
+  },
+  {
+    "id": "bb0540d2-1807-4ee1-bd9c-3371e9b87b2a",
+    "name": "Test Admin",
+    "email": "admin@example.com",
+    "password": "admin123",
+    "role": "admin",
+    "createdAt": "2026-04-03T19:44:56.626Z"
+  },
+  {
+    "id": "c801a730-5314-4eb1-8d60-fff774545c97",
+    "name": "Test Admin",
+    "email": "admin@example.com",
+    "password": "admin123",
+    "role": "admin",
+    "createdAt": "2026-04-03T19:44:58.204Z"
+  },
+  {
+    "id": "a8f9c4f9-4ccb-459f-89c1-c6b407165f4d",
+    "name": "Test Admin",
+    "email": "admin@example.com",
+    "password": "admin123",
+    "role": "admin",
+    "createdAt": "2026-04-03T19:44:59.911Z"
+  },
+  {
+    "id": "d7388376-6814-47e0-b8fa-190f26f9f1a9",
+    "name": "Test Admin",
+    "email": "admin@example.com",
+    "password": "admin123",
+    "role": "admin",
+    "createdAt": "2026-04-03T19:45:01.402Z"
+  },
+  {
+    "id": "1b2f6355-dc18-45bd-8832-0eae3515931e",
+    "name": "Test Admin",
+    "email": "admin@example.com",
+    "password": "admin123",
+    "role": "admin",
+    "createdAt": "2026-04-03T19:45:02.998Z"
+  },
+  {
+    "id": "67969df4-3945-48ed-bcc2-2cf177c6374f",
+    "name": "Test Admin",
+    "email": "admin@example.com",
+    "password": "admin123",
+    "role": "admin",
+    "createdAt": "2026-04-03T19:45:04.732Z"
+  },
+  {
+    "id": "73780d22-ed09-491a-9c68-d78b2194f979",
+    "name": "Test Admin",
+    "email": "admin@example.com",
+    "password": "admin123",
+    "role": "admin",
+    "createdAt": "2026-04-03T19:45:06.183Z"
+  },
+  {
+    "id": "923be412-663b-4212-a7d5-1e3a7acf3112",
+    "name": "Test Admin",
+    "email": "admin@example.com",
+    "password": "admin123",
+    "role": "admin",
+    "createdAt": "2026-04-03T19:45:07.757Z"
+  },
+  {
+    "id": "5ed5ebc4-f125-4bfc-a97a-4cdd792645ec",
+    "name": "Test Admin",
+    "email": "admin@example.com",
+    "password": "admin123",
+    "role": "admin",
+    "createdAt": "2026-04-03T19:45:09.936Z"
+  },
+  {
+    "id": "590e32b4-b27f-4dc5-8d45-3c2b7362a16b",
+    "name": "Test Admin",
+    "email": "admin@example.com",
+    "password": "admin123",
+    "role": "admin",
+    "createdAt": "2026-04-03T19:45:11.408Z"
+  }
+]
