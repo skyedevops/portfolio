@@ -1,10 +1,11 @@
-const MEASUREMENT_ID = 'G-68N6G3WJ35'
+const DEFAULT_MEASUREMENT_ID = 'G-68N6G3WJ35'
 const SCRIPT_ID = 'google-analytics-gtag'
 
 declare global {
   interface Window {
     dataLayer: unknown[]
     gtag?: (...args: unknown[]) => void
+    __gaMeasurementId?: string
   }
 }
 
@@ -13,7 +14,7 @@ const isTestRuntime = () => typeof navigator !== 'undefined' && /happy.?dom|jsdo
 
 const getCurrentPagePath = () => `${window.location.pathname}${window.location.search}${window.location.hash}`
 
-export const initializeGoogleAnalytics = (): boolean => {
+export const initializeGoogleAnalytics = (measurementId = DEFAULT_MEASUREMENT_ID): boolean => {
   if (!isBrowser()) return false
 
   if (document.getElementById(SCRIPT_ID)) {
@@ -30,16 +31,18 @@ export const initializeGoogleAnalytics = (): boolean => {
     }
   }
 
+  window.__gaMeasurementId = measurementId
+
   if (!isTestRuntime()) {
     const script = document.createElement('script')
     script.id = SCRIPT_ID
     script.async = true
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${MEASUREMENT_ID}`
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`
     document.head.appendChild(script)
   }
 
   window.gtag('js', new Date())
-  window.gtag('config', MEASUREMENT_ID, { send_page_view: true })
+  window.gtag('config', measurementId, { send_page_view: true })
 
   return true
 }

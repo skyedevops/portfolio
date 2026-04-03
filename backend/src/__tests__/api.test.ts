@@ -124,6 +124,40 @@ describe('API Endpoints (Integration - requires running server)', () => {
     expect(data.success).toBeFalsy()
   })
 
+  it('skip: POST /api/auth/login should return 401 for invalid credentials', async () => {
+    const serverRunning = await testIfServerRunning()
+    if (!serverRunning) {
+      return
+    }
+
+    const response = await fetch(`${BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'invalid@example.com', password: 'badpass' }),
+      signal: AbortSignal.timeout(5000)
+    })
+
+    expect(response.status).toBe(401)
+    const data = await response.json()
+    expect(data.success).toBe(false)
+  })
+
+  it('skip: GET /api/services should return service list', async () => {
+    const serverRunning = await testIfServerRunning()
+    if (!serverRunning) {
+      return
+    }
+
+    const response = await fetch(`${BASE_URL}/api/services`, {
+      signal: AbortSignal.timeout(5000)
+    })
+
+    expect(response.status).toBe(200)
+    const data = await response.json()
+    expect(data.success).toBe(true)
+    expect(Array.isArray(data.data)).toBe(true)
+  })
+
   it('skip: GET /api/nonexistent should return 404', async () => {
     const serverRunning = await testIfServerRunning()
     if (!serverRunning) {

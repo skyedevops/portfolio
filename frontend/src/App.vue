@@ -358,16 +358,25 @@
             <div class="space-y-6 md:space-y-8 mt-0" style="animation: slideInUp 0.6s ease-out 0.2s both;">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="p-4 border-2 bg-slate-900/50 rounded-lg">
-                  <h3 class="font-bold mb-3 uppercase text-xs">Admin token</h3>
-                  <input v-model="adminToken" placeholder="Enter admin token" class="w-full px-3 py-2 bg-slate-900 border-2 rounded text-sm" />
-                  <button @click="saveAdminToken" class="mt-2 w-full px-3 py-2 bg-cyan-500 rounded text-black font-bold">Save token</button>
+                  <h3 class="font-bold mb-3 uppercase text-xs">Admin & Auth</h3>
+                  <div class="space-y-2">
+                    <input v-model="adminToken" placeholder="Enter admin token" class="w-full px-3 py-2 bg-slate-900 border-2 rounded text-sm" />
+                    <button @click="saveAdminToken" class="w-full px-3 py-2 bg-cyan-500 rounded text-black font-bold">Save token</button>
+                    <div class="border-t border-slate-800 pt-3">
+                      <input v-model="authEmail" placeholder="Admin email" class="w-full px-3 py-2 bg-slate-900 border-2 rounded text-sm" />
+                      <input v-model="authPassword" placeholder="Password" type="password" class="w-full px-3 py-2 mt-2 bg-slate-900 border-2 rounded text-sm" />
+                      <button @click="login" class="w-full mt-2 px-3 py-2 bg-green-500 rounded font-bold">Login</button>
+                      <button v-if="currentUser" @click="logout" class="w-full mt-2 px-3 py-2 bg-red-500 rounded font-bold">Logout</button>
+                    </div>
+                  </div>
                 </div>
+
                 <div class="p-4 border-2 bg-slate-900/50 rounded-lg">
-                  <h3 class="font-bold mb-3 uppercase text-xs">User management</h3>
-                  <form @submit.prevent="createUser" class="space-y-2">
+                  <h3 class="font-bold mb-3 uppercase text-xs">Create user (admin only)</h3>
+                  <form @submit.prevent="createUserEntry" class="space-y-2">
                     <input v-model="newUser.name" placeholder="Name" class="w-full px-3 py-2 bg-slate-900 border-2 rounded text-sm" />
                     <input v-model="newUser.email" placeholder="Email" class="w-full px-3 py-2 bg-slate-900 border-2 rounded text-sm" />
-                    <input v-model="newUser.discord" placeholder="Discord" class="w-full px-3 py-2 bg-slate-900 border-2 rounded text-sm" />
+                    <input v-model="newUser.password" placeholder="Password" type="password" class="w-full px-3 py-2 bg-slate-900 border-2 rounded text-sm" />
                     <select v-model="newUser.role" class="w-full px-3 py-2 bg-slate-900 border-2 rounded text-sm">
                       <option value="admin">admin</option>
                       <option value="team">team</option>
@@ -388,6 +397,36 @@
                       <button @click="deleteUser(user.id)" class="text-red-400">Delete</button>
                     </li>
                   </ul>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-4 border-2 bg-slate-900/50 rounded-lg">
+                  <h3 class="font-bold mb-2 uppercase text-xs">DevOps Services</h3>
+                  <form @submit.prevent="createService" class="space-y-2">
+                    <input v-model="newService.title" placeholder="Service title" class="w-full px-3 py-2 bg-slate-900 border-2 rounded text-sm" />
+                    <textarea v-model="newService.description" placeholder="Service description" class="w-full px-3 py-2 bg-slate-900 border-2 rounded text-sm" rows="2"></textarea>
+                    <select v-model="newService.category" class="w-full px-3 py-2 bg-slate-900 border-2 rounded text-sm">
+                      <option value="infrastructure">infrastructure</option>
+                      <option value="security">security</option>
+                      <option value="observability">observability</option>
+                      <option value="automation">automation</option>
+                      <option value="platform">platform</option>
+                    </select>
+                    <button type="submit" class="w-full px-3 py-2 bg-blue-500 rounded font-bold">Add service</button>
+                  </form>
+                </div>
+
+                <div class="p-4 border-2 bg-slate-900/50 rounded-lg">
+                  <h3 class="font-bold mb-2 uppercase text-xs">Services</h3>
+                  <div class="max-h-48 overflow-y-auto">
+                    <ul>
+                      <li v-for="service in services" :key="service.id" class="flex justify-between gap-2 py-1">
+                        <span>{{ service.title }} ({{ service.category }})</span>
+                        <button @click="deleteService(service.id)" class="text-red-400">Delete</button>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
 
@@ -512,6 +551,15 @@ const formSuccess = ref(false)
 const formError = ref(false)
 const paymentLoading = ref(false)
 const paymentMessage = ref('')
+const adminToken = ref(localStorage.getItem('adminToken') || '')
+const currentUser = ref<{ id: string; name: string; email: string; role: string } | null>(null)
+const authEmail = ref('')
+const authPassword = ref('')
+const users = ref<Array<{ id: string; name: string; email: string; role: string }>>([])
+const contacts = ref<Array<any>>([])
+const services = ref<Array<{ id: string; title: string; description: string; category: string }>>([])
+const newUser = ref({ name: '', email: '', password: '', role: 'client' })
+const newService = ref({ title: '', description: '', category: 'infrastructure' })
 const navRef = ref<HTMLElement | null>(null)
 const navAboutRef = ref<HTMLElement | null>(null)
 const navSkillsRef = ref<HTMLElement | null>(null)
@@ -519,25 +567,28 @@ const navResumeRef = ref<HTMLElement | null>(null)
 const navContactRef = ref<HTMLElement | null>(null)
 const navAdminRef = ref<HTMLElement | null>(null)
 const currentPalette = ref(getRandomPalette())
+let maxScrollDepth = 0
 
 const trackCurrentPage = () => {
   const pagePath = `${window.location.pathname}${window.location.search}${window.location.hash}`
   trackPageView(pagePath)
 
-    // Simple payment outcome state handling
-    if (window.location.pathname === '/payment-success') {
-      activeSection.value = 'contact'
-      paymentMessage.value = 'Payment successful! Thank you for your order.'
-      paymentLoading.value = false
-      return
-    }
+  // Simple payment outcome state handling
+  if (window.location.pathname === '/payment-success') {
+    activeSection.value = 'contact'
+    paymentMessage.value = 'Payment successful! Thank you for your order.'
+    paymentLoading.value = false
+    return
+  }
 
-    if (window.location.pathname === '/payment-cancel') {
-      activeSection.value = 'contact'
-      paymentMessage.value = 'Payment was canceled. Try again or contact support.'
-      paymentLoading.value = false
-      return
-    }
+  if (window.location.pathname === '/payment-cancel') {
+    activeSection.value = 'contact'
+    paymentMessage.value = 'Payment was canceled. Try again or contact support.'
+    paymentLoading.value = false
+    return
+  }
+}
+
 const handleScroll = () => {
   const scrollHeight = document.documentElement.scrollHeight - window.innerHeight
   const scrollTop = window.scrollY
@@ -570,8 +621,8 @@ watch(activeSection, (newSection) => {
 
 // Handle browser back/forward navigation
 const handleHashChange = () => {
-  const hash = window.location.hash.slice(1)
-  const validSections = ['about', 'skills', 'resume', 'contact']
+  const hash = (window.location.hash || '').slice(1)
+  const validSections = ['about', 'skills', 'resume', 'contact', 'admin']
   activeSection.value = validSections.includes(hash) ? hash : null
   trackCurrentPage()
 }
@@ -653,13 +704,153 @@ const startPayment = async () => {
   }
 }
 
+const getAuthHeaders = () => {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  if (currentUser.value) {
+    headers.Authorization = `Bearer ${localStorage.getItem('authToken') || ''}`
+  } else if (adminToken.value) {
+    headers['x-admin-token'] = adminToken.value
+  }
+  return headers
+}
+
+const saveAdminToken = () => {
+  localStorage.setItem('adminToken', adminToken.value)
+  fetchAdminData()
+}
+
+const login = async () => {
+  try {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: authEmail.value, password: authPassword.value })
+    })
+    const data = await response.json()
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || 'Invalid login')
+    }
+    currentUser.value = data.data.user
+    localStorage.setItem('authToken', data.data.token)
+    fetchAdminData()
+  } catch (e) {
+    alert(e instanceof Error ? e.message : 'Login failed')
+  }
+}
+
+const logout = () => {
+  currentUser.value = null
+  localStorage.removeItem('authToken')
+  authEmail.value = ''
+  authPassword.value = ''
+}
+
+const fetchAdminData = async () => {
+  try {
+    const [usersRes, contactsRes, servicesRes] = await Promise.all([
+      fetch('/api/users', { headers: getAuthHeaders() }),
+      fetch('/api/contacts', { headers: getAuthHeaders() }),
+      fetch('/api/services', { headers: getAuthHeaders() })
+    ])
+
+    if (!usersRes.ok && usersRes.status !== 401) {
+      throw new Error('Failed to load users')
+    }
+
+    const usersData = await usersRes.json()
+    const contactsData = await contactsRes.json()
+    const servicesData = await servicesRes.json()
+
+    if (usersData.success) users.value = usersData.data || []
+    if (contactsData.success) contacts.value = contactsData.data || []
+    if (servicesData.success) services.value = servicesData.data || []
+
+  } catch (error) {
+    console.error('Admin data load failed:', error)
+  }
+}
+
+const createUserEntry = async () => {
+  try {
+    if (!newUser.value.name || !newUser.value.email || !newUser.value.password) {
+      alert('Name, email, and password are required')
+      return
+    }
+
+    const response = await fetch('/api/users', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(newUser.value)
+    })
+    const result = await response.json()
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || 'User creation failed')
+    }
+    users.value.unshift(result.data)
+    newUser.value = { name: '', email: '', password: '', role: 'client' }
+  } catch (error) {
+    alert(error instanceof Error ? error.message : 'Create user failed')
+  }
+}
+
+const deleteUser = async (userId: string) => {
+  if (!confirm('Delete this user?')) return
+  try {
+    const response = await fetch(`/api/users/${userId}`, { method: 'DELETE', headers: getAuthHeaders() })
+    const result = await response.json()
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || 'Delete failed')
+    }
+    users.value = users.value.filter((u) => u.id !== userId)
+  } catch (error) {
+    alert(error instanceof Error ? error.message : 'Delete user failed')
+  }
+}
+
+const createService = async () => {
+  try {
+    if (!newService.value.title || !newService.value.description) {
+      alert('Service title and description are required')
+      return
+    }
+
+    const response = await fetch('/api/services', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(newService.value)
+    })
+    const result = await response.json()
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || 'Service creation failed')
+    }
+    services.value.unshift(result.data)
+    newService.value = { title: '', description: '', category: 'infrastructure' }
+  } catch (error) {
+    alert(error instanceof Error ? error.message : 'Create service failed')
+  }
+}
+
+const deleteService = async (serviceId: string) => {
+  if (!confirm('Delete this service?')) return
+  try {
+    const response = await fetch(`/api/services/${serviceId}`, { method: 'DELETE', headers: getAuthHeaders() })
+    const result = await response.json()
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || 'Delete failed')
+    }
+    services.value = services.value.filter((s) => s.id !== serviceId)
+  } catch (error) {
+    alert(error instanceof Error ? error.message : 'Delete service failed')
+  }
+}
+
 onMounted(async () => {
   // Wait for DOM to fully render
   await nextTick()
 
   // Handle initial URL hash for deep linking
-  const hash = window.location.hash.slice(1)
-  const validSections = ['about', 'skills', 'resume', 'contact']
+  const hash = (window.location.hash || '').slice(1)
+  const validSections = ['about', 'skills', 'resume', 'contact', 'admin']
   if (validSections.includes(hash)) {
     activeSection.value = hash
   }
@@ -670,6 +861,11 @@ onMounted(async () => {
 
   // Apply selected color palette to DOM
   applyPaletteToDOM(currentPalette.value)
+
+  // Fetch admin data if auth token exists
+  if (adminToken.value || localStorage.getItem('authToken')) {
+    fetchAdminData()
+  }
 
   // Track external link clicks
   document.addEventListener('click', (e) => {
