@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": "1113933c-9d7c-4a4f-b5a7-61a014ab5ec1",
+    "name": "Test User",
+    "email": "test@example.com",
+    "discord": "",
+    "role": "client",
+    "subject": "Test inquiry",
+    "message": "This is a test message",
+    "createdAt": "2026-04-04T05:08:26.977Z"
+  }
+]

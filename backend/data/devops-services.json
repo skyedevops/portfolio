@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "id": "434350b7-a845-4902-abb3-e78b2f6206af",
+    "title": "Test Infrastructure Service",
+    "description": "A test service",
+    "category": "infrastructure",
+    "createdAt": "2026-04-04T05:08:15.746Z"
+  }
+]
