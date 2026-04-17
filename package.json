@@ -10,6 +10,7 @@
     "e2e"
   ],
   "scripts": {
+    "deploy": "wrangler deploy",
     "dev": "bun run --parallel dev:frontend dev:backend",
     "dev:frontend": "cd frontend && bun run dev",
     "dev:backend": "cd backend && bun run dev",
@@ -41,6 +42,7 @@
     "@sinclair/typebox": "^0.34.48"
   },
   "devDependencies": {
-    "@playwright/test": "^1.58.2"
+    "@playwright/test": "^1.58.2",
+    "wrangler": "^4.83.0"
   }
 }
